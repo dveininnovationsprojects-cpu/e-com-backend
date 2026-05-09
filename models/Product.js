@@ -2,15 +2,24 @@ const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    category: { 
-        type: String, 
-        required: true,
-        enum: ['Organic', 'Chemical', 'Tools', 'Seeds'] // Types of fertilizers
-    },
+    // models/Product.js
+category: { 
+    type: String, 
+    required: true,
+    enum: [
+        'Humic Acid',        
+        'Seaweed',           
+        'Potassium Humate',  
+        'Neem Oil',         
+        'Organic Granules', 
+        'Fish Oil'           
+    ] 
+},
     description: { type: String, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, required: true, default: 0 },
-    imageUrl: { type: String, required: true }, // Cloudinary URL inga save aagum
+    imageUrl: { type: String, required: true }, 
+    images: [String], 
     rating: { type: Number, default: 0 }
 }, { timestamps: true });
 

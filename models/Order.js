@@ -19,7 +19,14 @@ const orderSchema = new mongoose.Schema({
         enum: ['Placed', 'Delivery Processed', 'Shipped', 'Delivered', 'Cancelled'], 
         default: 'Placed' 
     },
-    whatsappSent: { type: Boolean, default: false } // Tracking if they clicked WhatsApp
+    trackingHistory: [{
+        status: String,
+        comment: String,
+        timestamp: { type: Date, default: Date.now }
+    }],
+    paymentScreenshot: { type: String },
+    whatsappSent: { type: Boolean, default: false }
+    
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);

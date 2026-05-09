@@ -77,7 +77,10 @@ exports.updateUserProfile = async (req, res) => {
             user.phone = req.body.phone || user.phone;
             user.address = req.body.address || user.address;
             
-            // Email update pandra option (Admin puthu email set panna)
+            // 🟢 PUTHUSA ADD PANNATHU (Username & Gender save aaga)
+            user.username = req.body.username || user.username;
+            user.gender = req.body.gender || user.gender;
+            
             if (req.body.email) {
                 const emailExists = await User.findOne({ email: req.body.email });
                 if (emailExists && emailExists._id.toString() !== user._id.toString()) {
@@ -86,21 +89,35 @@ exports.updateUserProfile = async (req, res) => {
                 user.email = req.body.email;
             }
 
-            // Password update pandra option (Admin default password mathikka)
             if (req.body.password) {
                 const salt = await bcrypt.genSalt(10);
                 user.password = await bcrypt.hash(req.body.password, salt);
             }
 
             const updatedUser = await user.save();
+            
             res.json({ 
                 _id: updatedUser._id, 
                 name: updatedUser.name, 
+                username: updatedUser.username, // 🟢 Response-layum anupanum
                 email: updatedUser.email, 
                 phone: updatedUser.phone, 
                 address: updatedUser.address,
+                gender: updatedUser.gender,     // 🟢 Response-layum anupanum
                 role: updatedUser.role
             });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+exports.getUserProfile = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password'); // Password thavira mathatha anuppum
+        if (user) {
+            res.json(user);
         } else {
             res.status(404).json({ message: 'User not found' });
         }

@@ -3,7 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const connectDB = require('./config/db');
 const cookieParser = require('cookie-parser');
-const { createDefaultAdmin } = require('./controllers/authController'); // Itha puthusa add pannirukom!
+const { createDefaultAdmin } = require('./controllers/authController');
 
 // Import Routes
 const authRoutes = require('./routes/authRoutes');
@@ -14,22 +14,45 @@ const supportRoutes = require('./routes/supportRoutes');
 
 dotenv.config();
 
-// Initialize DB and Create Admin (Ithu thaan mukkiyam!)
+// Connect Database & Create Admin
 connectDB().then(() => {
     createDefaultAdmin(); 
 });
 
 const app = express();
 
-app.use(cookieParser());
 // Middleware
+app.use(cookieParser());
 app.use(express.json());
+
+// =========================================================================
+// 🌐 CORS CONFIGURATION (Render & Netlify compatible)
+// =========================================================================
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'https://saraswathytraders.com', // 👈 Unga Netlify Custom Domain
+    'https://eclectic-wisp-215f1c.netlify.app' // 👈 Unga Netlify App URL
+];
+
 app.use(cors({
-    origin: 'http://localhost:3000', // React frontend ku
+    origin: function (origin, callback) {
+        // 1. Allow origins in the whitelist
+        // 2. Allow mobile/Postman (!origin)
+        // 3. Allow local network IPs (192.168.x.x)
+        if (!origin || allowedOrigins.includes(origin) || origin.includes('192.168.')) {
+            callback(null, true);
+        } else {
+            console.log("Blocked by CORS from origin:", origin); 
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 
-// API Routes
+// =========================================================================
+// 🚀 API ROUTES
+// =========================================================================
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
@@ -41,5 +64,10 @@ app.get('/', (req, res) => {
     res.send('Fertilizer E-commerce API is running pakka-va!');
 });
 
+// =========================================================================
+// ⚡ SERVER START (Port dynamic-ah Render tharum)
+// =========================================================================
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
+});

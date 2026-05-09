@@ -1,7 +1,9 @@
 const express = require('express');
-const { createSupportTicket } = require('../controllers/supportController');
 const router = express.Router();
+const { createTicket, getAllTickets } = require('../controllers/supportController');
+const { protect, admin } = require('../middleware/authMiddleware');
 
-router.post('/', createSupportTicket);
+router.post('/', protect, createTicket);
+router.get('/', protect, admin, getAllTickets);
 
 module.exports = router;

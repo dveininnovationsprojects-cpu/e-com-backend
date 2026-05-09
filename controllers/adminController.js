@@ -1,18 +1,32 @@
 const Product = require('../models/Product');
 const cloudinary = require('../config/cloudinary');
-const Order = require('../models/Order')
+const Order = require('../models/Order');
+const User = require('../models/User'); // 🟢 Puthusa add pannirukku (User model)
 
-// CREATE - Add New Product
+// CREATE - Add New Product with Multiple Images
 exports.createProduct = async (req, res) => {
     try {
         const { name, category, description, price, stock } = req.body;
-        const imageUrl = req.file ? req.file.path : null; // Cloudinary path
+        
+        // Multiple images handling (req.files use pannanum)
+        const images = req.files ? req.files.map(file => file.path) : [];
 
-        if (!imageUrl) return res.status(400).json({ message: 'Image is required' });
+        if (images.length === 0) {
+            return res.status(400).json({ message: 'At least one product image is required bro!' });
+        }
 
-        const product = new Product({ name, category, description, price, stock, imageUrl });
+        const product = new Product({ 
+            name, 
+            category, 
+            description, 
+            price, 
+            stock, 
+            imageUrl: images[0], // First image as thumbnail
+            images: images      // Array of all 5 images
+        });
+
         await product.save();
-        res.status(201).json({ message: 'Product added successfully', product });
+        res.status(201).json({ success: true, product });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -64,23 +78,76 @@ exports.getAllOrders = async (req, res) => {
     }
 };
 
-// Admin - Update Order & Payment Status
 exports.updateOrderStatus = async (req, res) => {
     try {
-        const { status, paymentStatus } = req.body;
+        const { status, paymentStatus, comment } = req.body;
+        
+        const order = await Order.findById(req.params.id);
 
-        // findByIdAndUpdate use panna specific fields mattum update aagum, validation error varathu
-        const updatedOrder = await Order.findByIdAndUpdate(
-            req.params.id,
-            { status, paymentStatus },
-            { new: true, runValidators: false } // validation off pannidrom update-ku mattum
-        );
+        if (order) {
+            // 1. Main Status update pandrom
+            order.status = status || order.status;
+            order.paymentStatus = paymentStatus || order.paymentStatus;
 
-        if (!updatedOrder) {
-            return res.status(404).json({ message: 'Order not found' });
+            // 2. Ippo antha history array-kulla puthu status-a push pandrom
+            // Ithu thaan miss aachu!
+            order.trackingHistory.push({ 
+                status: status || order.status, 
+                comment: comment || `Order status updated to ${status}`,
+                timestamp: new Date()
+            });
+
+            await order.save();
+            res.json(order);
+        } else {
+            res.status(404).json({ message: 'Order not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+// controllers/adminController.js
+exports.getAllUsers = async (req, res) => {
+    try {
+        // Fetch ONLY users who have the role 'user' (excludes 'admin')
+        const users = await User.find({ role: 'user' }).select('-password');
+        res.json(users);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+exports.updateAdminUPI = async (req, res) => {
+    try {
+        const updateData = {};
+        if (req.body.upiId) updateData.upiId = req.body.upiId;
+
+        // PATH use panna thaan Cloudinary URL kidaikkum
+        if (req.file) {
+            updateData.qrCode = req.file.path; 
         }
 
-        res.json(updatedOrder);
+        const user = await User.findByIdAndUpdate(
+    req.user._id, 
+    updateData, 
+    { returnDocument: 'after' } 
+);
+
+        res.json({ 
+            success: true, 
+            message: 'QR Updated!', 
+            upiId: user.upiId,
+            qrCode: user.qrCode // Full https link ippo varum
+        });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+// Admin details get panna (UPI ID and QR code-kaga)
+exports.getAdminSettings = async (req, res) => {
+    try {
+        const admin = await User.findOne({ role: 'admin' }).select('upiId qrCode');
+        res.json(admin);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }

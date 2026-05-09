@@ -1,23 +1,23 @@
 const Order = require('../models/Order');
 
-// 1. Create New Order
+
 exports.createOrder = async (req, res) => {
     try {
         const { orderItems, totalAmount, shippingAddress } = req.body;
-
-        if (orderItems && orderItems.length === 0) {
-            return res.status(400).json({ message: 'No items in order' });
-        }
+        
+        
+        const screenshotUrl = req.file ? req.file.path : "";
 
         const order = new Order({
             user: req.user._id,
-            orderItems,
+            orderItems: JSON.parse(orderItems), 
             totalAmount,
-            shippingAddress
+            shippingAddress,
+            paymentScreenshot: screenshotUrl 
         });
 
         const createdOrder = await order.save();
-        res.status(201).json(createdOrder);
+        res.status(201).json(createdOrder); 
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
