@@ -5,25 +5,26 @@ const jwt = require('jsonwebtoken');
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 
 // Reusable function to set HttpOnly Cookie
+// Reusable function to set HttpOnly Cookie
 const sendTokenResponse = (user, statusCode, res) => {
     const token = generateToken(user._id);
 
     const options = {
         expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-        httpOnly: true, // Prevent XSS attacks
-        secure: process.env.NODE_ENV === 'production', // true na HTTPS la matum thaan work aagum (for production)
-        sameSite: 'strict' // Prevent CSRF attacks
+        httpOnly: true,    // Prevent XSS attacks
+        secure: true,      // 👈 MUKKOYOM: Live-la (HTTPS) work aaga 'true' kandippa irukanum
+        sameSite: 'none'   // 👈 MUKKOYOM: Netlify (Domain A) to Render (Domain B) connect panna 'none' thaan venum
     };
 
     res.status(statusCode)
-       .cookie('token', token, options)
-       .json({
-           success: true,
-           _id: user._id,
-           name: user.name,
-           email: user.email,
-           role: user.role
-       });
+        .cookie('token', token, options)
+        .json({
+            success: true,
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role
+        });
 };
 
 exports.registerUser = async (req, res) => {

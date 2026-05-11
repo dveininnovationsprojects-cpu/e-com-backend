@@ -26,29 +26,35 @@ app.use(cookieParser());
 app.use(express.json());
 
 // =========================================================================
-// 🌐 CORS CONFIGURATION (Render & Netlify compatible)
+// 🌐 CORS CONFIGURATION (Enhanced for POST/PUT/DELETE & Cookies)
 // =========================================================================
 const allowedOrigins = [
     'http://localhost:5173',
     'http://localhost:5174',
-    'https://saraswathytraders.com', // 👈 Unga Netlify Custom Domain
-    'https://eclectic-wisp-215f1c.netlify.app' // 👈 Unga Netlify App URL
+    'https://saraswathytraders.com',
+    'https://www.saraswathytraders.com',
+    'https://eclectic-wisp-215f1c.netlify.app'
 ];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // 1. Allow origins in the whitelist
-        // 2. Allow mobile/Postman (!origin)
-        // 3. Allow local network IPs (192.168.x.x)
-        if (!origin || allowedOrigins.includes(origin) || origin.includes('192.168.')) {
+        // Allow requests with no origin (like mobile apps or curl)
+        if (!origin) return callback(null, true);
+        
+        if (allowedOrigins.includes(origin) || origin.includes('192.168.')) {
             callback(null, true);
         } else {
             console.log("Blocked by CORS from origin:", origin); 
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true
+    credentials: true, // 👈 Cookies (JWT) anuppa ithu compulsory
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // 👈 Ella methods-um allow panrom
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'] // 👈 Headers allow panrom
 }));
+
+// Express-ku mukkoyamaana pre-flight request handle panna options
+app.options('*', cors()); 
 
 // =========================================================================
 // 🚀 API ROUTES
@@ -61,11 +67,11 @@ app.use('/api/support', supportRoutes);
 
 // Root Endpoint
 app.get('/', (req, res) => {
-    res.send('Fertilizer E-commerce API is running pakka-va!');
+    res.send('Fertilizer E-commerce API is running pakka-va on Render!');
 });
 
 // =========================================================================
-// ⚡ SERVER START (Port dynamic-ah Render tharum)
+// ⚡ SERVER START
 // =========================================================================
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
