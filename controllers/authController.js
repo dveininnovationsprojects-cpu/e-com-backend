@@ -73,15 +73,25 @@ exports.logoutUser = (req, res) => {
 exports.updateUserProfile = async (req, res) => {
     try {
         const user = await User.findById(req.user._id);
+        
         if (user) {
+            // Basic details
             user.name = req.body.name || user.name;
             user.phone = req.body.phone || user.phone;
-            user.address = req.body.address || user.address;
-            
-            // 🟢 PUTHUSA ADD PANNATHU (Username & Gender save aaga)
             user.username = req.body.username || user.username;
             user.gender = req.body.gender || user.gender;
             
+            // 🟢 PUDHU ADDRESS FIELDS SAVE LOGIC
+            // undefined aah illana (yani form-la irundhu data vandha) update pannu
+            if(req.body.buildingNo !== undefined) user.buildingNo = req.body.buildingNo;
+            if(req.body.street !== undefined) user.street = req.body.street;
+            if(req.body.city !== undefined) user.city = req.body.city;
+            if(req.body.district !== undefined) user.district = req.body.district;
+            if(req.body.state !== undefined) user.state = req.body.state;
+            if(req.body.country !== undefined) user.country = req.body.country;
+            if(req.body.pinCode !== undefined) user.pinCode = req.body.pinCode;
+
+            // Email and password logic (apdiye irukatum)
             if (req.body.email) {
                 const emailExists = await User.findOne({ email: req.body.email });
                 if (emailExists && emailExists._id.toString() !== user._id.toString()) {
@@ -97,16 +107,8 @@ exports.updateUserProfile = async (req, res) => {
 
             const updatedUser = await user.save();
             
-            res.json({ 
-                _id: updatedUser._id, 
-                name: updatedUser.name, 
-                username: updatedUser.username, // 🟢 Response-layum anupanum
-                email: updatedUser.email, 
-                phone: updatedUser.phone, 
-                address: updatedUser.address,
-                gender: updatedUser.gender,     // 🟢 Response-layum anupanum
-                role: updatedUser.role
-            });
+            // Send back the full updated user object
+            res.json(updatedUser); 
         } else {
             res.status(404).json({ message: 'User not found' });
         }

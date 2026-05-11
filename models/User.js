@@ -1,4 +1,4 @@
-const mongoose = require('mongoose'); // <--- INTHA LINE KANDIPPA IRUKANUM
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
@@ -7,12 +7,18 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true },
     role: { type: String, enum: ['user', 'admin'], default: 'user' },
     phone: { type: String, default: '' },
-    address: { type: String, default: '' },
     gender: { type: String, enum: ['male', 'female', 'other', ''], default: '' },
     
-    // Ippo intha field-ah mukkoyama add pannunga (Illana QR save aagathu)
+    // 🟢 PUDHU ADDRESS FIELDS (Thani thaniya)
+    buildingNo: { type: String, default: '' },
+    street: { type: String, default: '' },
+    city: { type: String, default: '' },
+    district: { type: String, default: '' },
+    state: { type: String, default: '' }, // State user-eh fill pannatum
+    country: { type: String, default: 'India' }, // Default India
+    pinCode: { type: String, default: '' },
+
     qrCode: { type: String, default: "" }, 
-    
     upiId: { type: String, default: "selvamanisellan.18@oksbi" }
 }, { timestamps: true });
 
