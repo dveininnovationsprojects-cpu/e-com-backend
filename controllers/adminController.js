@@ -6,7 +6,10 @@ const User = require('../models/User'); // 🟢 Puthusa add pannirukku (User mod
 // CREATE - Add New Product with Multiple Images
 exports.createProduct = async (req, res) => {
     try {
-        const { name, category, description, price, stock } = req.body;
+        // ❌ Pazhaiya line: const { name, category, description, price, stock } = req.body;
+        
+        // ✅ Pudhu line (mrp add panniyachu):
+        const { name, category, description, mrp, price, stock } = req.body; 
         
         // Multiple images handling (req.files use pannanum)
         const images = req.files ? req.files.map(file => file.path) : [];
@@ -19,7 +22,7 @@ exports.createProduct = async (req, res) => {
             name, 
             category, 
             description, 
-            mrp,
+            mrp, // 👈 Ippo intha mrp error aagadhu, mela define pannitom!
             price, 
             stock, 
             imageUrl: images[0], // First image as thumbnail
