@@ -16,6 +16,7 @@ category: {
     ] 
 },
     description: { type: String, required: true },
+    mrp: { type: Number, required: true },
     price: { type: Number, required: true },
     stock: { type: Number, required: true, default: 0 },
     imageUrl: { type: String, required: true }, 

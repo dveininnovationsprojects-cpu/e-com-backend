@@ -19,6 +19,7 @@ exports.createProduct = async (req, res) => {
             name, 
             category, 
             description, 
+            mrp,
             price, 
             stock, 
             imageUrl: images[0], // First image as thumbnail
@@ -41,6 +42,7 @@ exports.updateProduct = async (req, res) => {
         product.name = req.body.name || product.name;
         product.category = req.body.category || product.category;
         product.description = req.body.description || product.description;
+        product.mrp = req.body.mrp || product.mrp;
         product.price = req.body.price || product.price;
         product.stock = req.body.stock || product.stock;
 
