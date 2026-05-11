@@ -63,7 +63,7 @@ app.use('/api/support', supportRoutes);
 
 // Root Endpoint
 app.get('/', (req, res) => {
-    res.send('Fertilizer E-commerce API is running pakka-va on Render!');
+    res.send('Fertilizer E-commerce API is running!');
 });
 
 // =========================================================================
