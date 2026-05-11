@@ -38,23 +38,19 @@ const allowedOrigins = [
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl)
-        if (!origin) return callback(null, true);
-        
-        if (allowedOrigins.includes(origin) || origin.includes('192.168.')) {
+        if (!origin || allowedOrigins.includes(origin) || origin.includes('192.168.')) {
             callback(null, true);
         } else {
-            console.log("Blocked by CORS from origin:", origin); 
             callback(new Error('Not allowed by CORS'));
         }
     },
-    credentials: true, // 👈 Cookies (JWT) anuppa ithu compulsory
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'], // 👈 Ella methods-um allow panrom
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'] // 👈 Headers allow panrom
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    optionsSuccessStatus: 204 // 👈 Idhu thaan OPTIONS request-ku response kudukkum
 }));
 
-// Express-ku mukkoyamaana pre-flight request handle panna options
-app.options('*', cors()); 
+
 
 // =========================================================================
 // 🚀 API ROUTES
