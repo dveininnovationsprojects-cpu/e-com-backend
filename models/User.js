@@ -9,13 +9,12 @@ const userSchema = new mongoose.Schema({
     phone: { type: String, default: '' },
     gender: { type: String, enum: ['male', 'female', 'other', ''], default: '' },
     
-    // 🟢 PUDHU ADDRESS FIELDS (Thani thaniya)
     buildingNo: { type: String, default: '' },
     street: { type: String, default: '' },
     city: { type: String, default: '' },
     district: { type: String, default: '' },
-    state: { type: String, default: '' }, // State user-eh fill pannatum
-    country: { type: String, default: 'India' }, // Default India
+    state: { type: String, default: '' }, 
+    country: { type: String, default: 'India' },
     pinCode: { type: String, default: '' },
 
     qrCode: { type: String, default: "" }, 

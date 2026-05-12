@@ -23,7 +23,6 @@ exports.createOrder = async (req, res) => {
     }
 };
 
-// 2. Get Logged-in User Orders (Order History)
 exports.getMyOrders = async (req, res) => {
     try {
         const orders = await Order.find({ user: req.user._id }).sort({ createdAt: -1 });
@@ -33,7 +32,6 @@ exports.getMyOrders = async (req, res) => {
     }
 };
 
-// 3. Cancel Order (Only if not Shipped/Delivered)
 exports.cancelOrder = async (req, res) => {
     try {
         const order = await Order.findById(req.params.id);

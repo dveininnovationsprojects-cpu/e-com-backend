@@ -1,17 +1,13 @@
 const Product = require('../models/Product');
 
-// Get all products with search and filter
 exports.getProducts = async (req, res) => {
     try {
         const { search, category } = req.query;
         let query = {};
-
-        // Search logic
         if (search) {
             query.name = { $regex: search, $options: 'i' };
         }
 
-        // Category filter logic
         if (category && category !== 'All') {
             query.category = category;
         }
@@ -23,7 +19,7 @@ exports.getProducts = async (req, res) => {
     }
 };
 
-// Get single product details
+
 exports.getProductById = async (req, res) => {
     try {
         const product = await Product.findById(req.params.id);

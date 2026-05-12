@@ -25,7 +25,6 @@ router.put('/orders/:id', protect, admin, updateOrderStatus);
 
 
 router.get('/users', protect, admin, getAllUsers);
-// PUT method - upi update-la 'qrCode' image-ah handle panna sollunga
 router.put('/update-upi', protect, admin, upload.single('qrCode'), updateAdminUPI);
 router.get('/settings', getAdminSettings);
 
